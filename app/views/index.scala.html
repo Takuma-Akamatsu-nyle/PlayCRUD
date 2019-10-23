@@ -15,7 +15,8 @@
       User
       <ul>
       @for(u <- users) {
-        <li>@u.id @u.name (@u.age)
+        <li>
+          <a href="./@u.id">@u.id @u.name (@u.age)</a>
           <form method="get" action=@{"/deleteUser/" + u.id}>
             <input type="submit" value="Delete" />
           </form></li>
@@ -35,7 +36,11 @@
           @CSRF.formField
 
           <div class="buttons">
-            <input type="submit" value="Create"/>
+            @if(selectUserId == 0){
+              <input type="submit" value="Create"/>
+            } else {
+              <input type="submit" value="Update"/>
+            }
           </div>
           }
         </li>

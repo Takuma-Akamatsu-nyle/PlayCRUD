@@ -44,7 +44,11 @@ class HomeController @Inject()(cc: MessagesControllerComponents, ur: UserReposit
 
   def selectUser(id: Long) = Action.async { implicit request =>
     ur.findAll map {
-      case users => Ok(views.html.index(users, userForm, id))
+      case users => {
+        val selectedUser: User = users.filter(u => u.id == id).head
+        val selectedForm: Form[CreateUserForm] = userForm.fill(CreateUserForm.apply(selectedUser.name, selectedUser.age.toInt))
+        Ok(views.html.index(users, selectedForm, id))
+      }
     }
   }
 
