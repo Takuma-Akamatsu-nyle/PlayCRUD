@@ -1,0 +1,43 @@
+@(users: Seq[User], user: Form[CreateUserForm], selectUserId: Long = 0)(implicit request: MessagesRequestHeader)
+
+@import helper._
+
+@request.flash.get("success").map { key =>
+@request.messages(key)
+}
+
+<div>
+  <h1>メインページ</h1>
+  <h2>テーブルリスト</h2>
+  <div class="button">Create</div>
+  <ul>
+    <li>
+      User
+      <ul>
+      @for(u <- users) {
+        <li>@u.id @u.name (@u.age)
+          <form method="get" action=@{"/deleteUser/" + u.id}>
+            <input type="submit" value="Delete" />
+          </form></li>
+      }
+      </ul>
+      <ul>
+        操作
+        <li>
+          @form(routes.HomeController.addUser()) {
+          u.id = selectUserId
+          <input type="hidden" value="@user("id").value" name="id">
+          @inputText(user("name"))
+          @inputText(user("age"))
+          @CSRF.formField
+
+          <div class="buttons">
+            <input type="submit" value="Create"/>
+          </div>
+          }
+        </li>
+        <li>Delete</li>
+      </ul>
+    </li>
+  </ul>
+</div>
