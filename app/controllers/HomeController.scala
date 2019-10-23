@@ -17,7 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
  * ユーザ作成フォーム
  */
-case class CreateUserForm(id: Long, name: String, age: Int)
+case class CreateUserForm(name: String, age: Int)
 
 class HomeController @Inject()(cc: MessagesControllerComponents, ur: UserRepository)
                               (implicit ec: ExecutionContext) extends MessagesAbstractController(cc) {
@@ -27,7 +27,6 @@ class HomeController @Inject()(cc: MessagesControllerComponents, ur: UserReposit
    */
   val userForm: Form[CreateUserForm] = Form {
     mapping(
-      "id" -> longNumber,
       "name" -> nonEmptyText,
       "age" -> number.verifying(min(0), max(140))
     )(CreateUserForm.apply)(CreateUserForm.unapply)
@@ -45,7 +44,7 @@ class HomeController @Inject()(cc: MessagesControllerComponents, ur: UserReposit
 
   def selectUser(id: Long) = Action.async { implicit request =>
     ur.findAll map {
-      case users => Ok(views.html.index(users, userForm))
+      case users => Ok(views.html.index(users, userForm, id))
     }
   }
 
@@ -82,7 +81,7 @@ class HomeController @Inject()(cc: MessagesControllerComponents, ur: UserReposit
         }
       },
       user => {
-        ur.add(User(id, user.name, user.age)).map { _ =>
+        ur.update(User(id, user.name, user.age)).map { _ =>
           // If successful, we simply redirect to the index page.
           Redirect(routes.HomeController.index).flashing("success" -> "user.created")
         }
@@ -91,7 +90,7 @@ class HomeController @Inject()(cc: MessagesControllerComponents, ur: UserReposit
   }
 
   def deleteUser(id: Long) = Action.async { implicit request =>
-    ur.delete(id).map{ _ =>
+    ur.deleteById(id).map{ _ =>
       Redirect(routes.HomeController.index).flashing("success" -> "user.deleted")
     }
   }

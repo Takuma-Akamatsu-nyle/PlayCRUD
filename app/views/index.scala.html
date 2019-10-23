@@ -24,9 +24,12 @@
       <ul>
         操作
         <li>
-          @form(routes.HomeController.addUser()) {
-          u.id = selectUserId
-          <input type="hidden" value="@user("id").value" name="id">
+          @form(
+            selectUserId match {
+              case 0 => routes.HomeController.addUser()
+              case _ => routes.HomeController.updateUser(selectUserId)
+            }
+          ) {
           @inputText(user("name"))
           @inputText(user("age"))
           @CSRF.formField

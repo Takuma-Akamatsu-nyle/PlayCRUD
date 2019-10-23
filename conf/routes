@@ -5,7 +5,8 @@
 # Home page
 GET     /                           controllers.HomeController.index
 POST    /addUser                     controllers.HomeController.addUser
-GET    /updateUser/:id                     controllers.HomeController.updateUser(id: Long)
+GET     /:id                        controllers.HomeController.selectUser(id: Long)
+POST    /updateUser/:id                     controllers.HomeController.updateUser(id: Long)
 GET    /deleteUser/:id                     controllers.HomeController.deleteUser(id: Long)
 GET     /person                           controllers.PersonController.index
 POST    /addPerson                     controllers.PersonController.addPerson

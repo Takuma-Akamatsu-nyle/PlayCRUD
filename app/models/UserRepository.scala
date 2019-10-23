@@ -7,7 +7,11 @@ import slick.jdbc.MySQLProfile.api._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class UserTableDef(tag: Tag) extends Table[User](tag, "user"){
+/**
+ * Userテーブル定義
+ * @param tag
+ */
+class UserTable(tag: Tag) extends Table[User](tag, "user"){
   def id = column[Long]("id", O.PrimaryKey,O.AutoInc)
   def name = column[String]("name")
   def age = column[Long]("age")
@@ -26,11 +30,12 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
   // dbをスコープに取り込みます。これにより、実際のdb操作が可能になります。
   // HasDatabaseConfigProviderに含まれているので不要
   // import dbConfig._
+
   // Slick DSLをスコープに取り込みます。これにより、テーブルやその他のクエリを定義できます。
   import profile.api._
 
 
-  val users = TableQuery[UserTableDef]
+  val users = TableQuery[UserTable]
 
 
   def add(user: User): Future[String] = {
@@ -39,7 +44,14 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     }
   }
 
-  def delete(id: Long): Future[Int] = {
+  def update(user: User):Future[String] = {
+    dbConfig.db.run(users.filter(_.id === user.id).map(u => (u.name, u.age)).update(user.name, user.age))
+      .map(res => "User successfully updated").recover {
+      case ex: Exception => ex.getCause.getMessage
+    }
+  }
+
+  def deleteById(id: Long): Future[Int] = {
     dbConfig.db.run(users.filter(_.id === id).delete)
   }
 
